@@ -1,4 +1,7 @@
-import { Controller, Get, Post, Body,Param, Patch, Delete, ParseIntPipe} from '@nestjs/common'; 
+import { Controller, Get, Post, Body,Param, Patch, Delete, ParseIntPipe, UseGuards} from '@nestjs/common'; 
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';      
+import { Roles } from '../auth/roles.decorator';        
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto'; 
 import { UpdateUser } from './dto/update-user.dto'; 
@@ -7,11 +10,18 @@ import { UpdateUser } from './dto/update-user.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
- 
-  @Get()
-  getAllUsers() {
-    return this.usersService.findAll();
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin') // only admin role can access
+  
+  @Get('all')
+  findAllUsers() {
+    return ['User1', 'User2', 'User3'];
   }
+  
+  //@Get()
+  //getAllUsers() {
+  //  return this.usersService.findAll();
+  //}
 
   @Get(':id')
   getUser(@Param('id') id: number) {
