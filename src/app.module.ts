@@ -8,7 +8,9 @@ import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { MatchingModule } from './matching/matching.module';
 import { GroupsModule } from './groups/groups.module'; 
-import {User} from './users/entities/user.entity';
+import { Message } from './messages/entities/messages.entity';
+import { User } from './users/entities/user.entity';
+
 @Module({
  
   imports: [
@@ -24,7 +26,7 @@ username: config.get('DB_USERNAME'),
 password: config.get('DB_PASSWORD'),
 serviceName: config.get('DB_SERVICE_NAME'),
 synchronize: config.get('DB_SYNCHRONIZE') === 'true',
-entities: [ User],
+entities: [ User, Message],
 logging: true,
 }),
 }),

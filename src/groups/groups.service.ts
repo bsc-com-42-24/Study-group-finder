@@ -11,7 +11,7 @@ listAll(){
 }
 
 getAlldetails(id:string){
-    return { id, title: 'Group ' + id };
+   return { id, title: 'Group' + id};
 }
 
 updategroup(id:string, body:any) {
@@ -22,3 +22,77 @@ deletegroup(id: string){
     return{message: 'Group deleted',id};
      }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

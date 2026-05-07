@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Param, Put, Delete, Body } from '@nestjs/common';
 import {GroupsService } from './groups.service';
+import { title } from 'process';
 
 
 @Controller('groups')
@@ -14,11 +15,17 @@ export class GroupsController {
     @Get(':id')
     getDetails(@Param('id')id:string){
         return this.groupsService.getAlldetails(id);
+    
     }
 
     @Put(':id')
     update(@Param('id')id: string, @Body()body:any){
         return this.groupsService.updategroup(id, body);
+    }
+
+    @Post()
+    create(@Body() body:any) {
+        return this.groupsService.create(body);
     }
 
     @Delete(':id')
