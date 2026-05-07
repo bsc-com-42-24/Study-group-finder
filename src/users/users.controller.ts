@@ -5,6 +5,7 @@ import { Roles } from '../auth/roles.decorator';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto'; 
 import { UpdateUser } from './dto/update-user.dto'; 
+import { RegisterDto } from 'src/auth/dto/register.dto';
 
 @Controller('users')
 export class UsersController {
@@ -18,10 +19,10 @@ export class UsersController {
     return ['User1', 'User2', 'User3'];
   }
   
-  //@Get()
-  //getAllUsers() {
-  //  return this.usersService.findAll();
-  //}
+  @Get()
+  getAllUsers() {
+    return this.usersService.findAll();
+  }
 
   @Get(':id')
   getUser(@Param('id') id: number) {
