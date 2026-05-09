@@ -1,36 +1,37 @@
 import { Controller, Post, Get, Param, Put, Delete, Body } from '@nestjs/common';
 import {GroupsService } from './groups.service';
-import { title } from 'process';
-
+import { createGroupDto } from './dto/create-group.dto';
+ 
 
 @Controller('groups')
 export class GroupsController {
-    constructor(private readonly groupsService: GroupsService){}
+  constructor(private readonly groupsService: GroupsService) {}
 
-    @Get()
-     list(){
-        return this.groupsService.listAll();
-    }
-    
-    @Get(':id')
-    getDetails(@Param('id')id:string){
-        return this.groupsService.getAlldetails(id);
-    
-    }
+  @Post()
+  create(@Body() createGroupDto: createGroupDto) {
+    return this.groupsService.create(createGroupDto);
+  }
 
-    @Put(':id')
-    update(@Param('id')id: string, @Body()body:any){
-        return this.groupsService.updategroup(id, body);
-    }
+  @Get()
+  findAll() {
+    return this.groupsService.findAll();
+  }
 
-    @Post()
-    create(@Body() body:any) {
-        return this.groupsService.create(body);
-    }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.groupsService.findOne(Number(id));
+  }
 
-    @Delete(':id')
-    remove(@Param('id')id:string){
-        return this.groupsService.deletegroup(id);
-    }
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateData: createGroupDto,
+  ) {
+    return this.groupsService.update(Number(id), updateData);
+  }
 
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.groupsService.remove(Number(id));
+  }
 }
