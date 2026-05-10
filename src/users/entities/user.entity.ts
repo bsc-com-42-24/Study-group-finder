@@ -23,12 +23,17 @@ export class User {
   program?: string;
 
   @Column({ type: 'number', nullable: true })
-  year?: number;
+     year?: number;
 
   @Column({ length: 255, nullable: true })
-  location?: string;
+    location?: string;
 
   @Column({ length: 255, nullable: true })
-  profilePicture?: string;
+      profilePicture?: string;
+
+  @Column({length:255,nullable:true})
+      UserType?:string;
+
+  
 }
 

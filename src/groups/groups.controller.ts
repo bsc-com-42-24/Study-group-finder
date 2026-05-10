@@ -1,36 +1,56 @@
-import { Controller, Post, Get, Param, Put, Delete, Body } from '@nestjs/common';
-import {GroupsService } from './groups.service';
-import { title } from 'process';
-
+import { Controller, Post, Body, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import oracledb from 'oracledb';
 
 @Controller('groups')
 export class GroupsController {
-    constructor(private readonly groupsService: GroupsService){}
 
-    @Get()
-     list(){
-        return this.groupsService.listAll();
-    }
-    
-    @Get(':id')
-    getDetails(@Param('id')id:string){
-        return this.groupsService.getAlldetails(id);
-    
-    }
+  @UseGuards(AuthGuard('jwt')) // protects route, puts user on req.user
+  @Post()
+  async createGroup(@Body() body: any, @Req() req: any) {
+    const { groupName, course, year } = body;
+    const adminId = req.user.id; 
 
-    @Put(':id')
-    update(@Param('id')id: string, @Body()body:any){
-        return this.groupsService.updategroup(id, body);
-    }
+    let connection;
+    try {
+      connection = await oracledb.getConnection();
 
-    @Post()
-    create(@Body() body:any) {
-        return this.groupsService.create(body);
-    }
+      const result = await connection.execute(
+        `INSERT INTO groups (group_name, course, year, admin_id)
+         VALUES (:groupName, :course, :year, :adminId)
+         RETURNING id INTO :id`,
+        {
+          groupName,
+          course,
+          year,
+          adminId,
+          id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+        },
+        { autoCommit: true }
+      );
 
-    @Delete(':id')
-    remove(@Param('id')id:string){
-        return this.groupsService.deletegroup(id);
-    }
+      const groupId = result.outBinds.id[0];
 
+      
+      await connection.execute(
+        `INSERT INTO group_members (group_id, user_id) VALUES (:groupId, :userId)`,
+        { groupId, userId: adminId },
+        { autoCommit: true }
+      );
+
+      return { id: groupId, groupName, course, year, admin: adminId };
+
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Failed to create group');
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
 }

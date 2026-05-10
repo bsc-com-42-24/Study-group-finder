@@ -1,43 +1,51 @@
-
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
-import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { Controller, Post, Body, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import oracledb from 'oracledb';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
 
-  @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
-  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('send')
+  async sendMessage(@Body() body: any, @Req() req: any) {
+    const { receiver, content } = body;
+    const sender = req.user?.id; 
 
-  @Get()
-  findAll() {
-    return this.messagesService.findAll();
-  }
+    if (!sender ||!receiver ||!content) {
+      throw new BadRequestException('Sender, receiver, and content are required');
+    }
 
-  @Get('group/:groupId')
-  findByGroup(@Param('groupId') groupId: number) {
-    return this.messagesService.findByGroup(groupId);
-  }
+    let connection;
+    try {
+      connection = await oracledb.getConnection();
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.messagesService.findOne(id);
-  }
+      const result = await connection.execute(
+        `INSERT INTO messages (sender_id, receiver_id, content, created_at)
+         VALUES (:sender, :receiver, :content, SYSTIMESTAMP)
+         RETURNING id INTO :id`,
+        {
+          sender,
+          receiver,
+          content,
+          id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+        },
+        { autoCommit: true }
+      );
 
-  @Patch(':id')
-  update(
-    @Param('id') id: number,
-    @Body() updateMessageDto: UpdateMessageDto,
-  ) {
-    return this.messagesService.update(id, updateMessageDto);
-  }
+      const messageId = result.outBinds.id[0];
+      return { id: messageId, sender, receiver, content };
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.messagesService.remove(id);
+    } catch (error) {
+      console.error(error);
+      throw new BadRequestException('Failed to send message');
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
   }
 }
