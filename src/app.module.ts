@@ -10,6 +10,7 @@ import { MatchingModule } from './matching/matching.module';
 import { GroupsModule } from './groups/groups.module'; 
 import { Message } from './messages/entities/messages.entity';
 import { User } from './users/entities/user.entity';
+import { Group } from './groups/entities/group.entity';  
 
 @Module({
  
@@ -26,7 +27,7 @@ username: config.get('DB_USERNAME'),
 password: config.get('DB_PASSWORD'),
 serviceName: config.get('DB_SERVICE_NAME'),
 synchronize: config.get('DB_SYNCHRONIZE') === 'true',
-entities: [ User, Message],
+entities: [ User, Message, Group],
 logging: true,
 }),
 }),

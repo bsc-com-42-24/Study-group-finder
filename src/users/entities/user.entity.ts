@@ -13,6 +13,9 @@ export class User {
   @Column({ length: 255 })
   password?: string;
 
+  @Column({ default: 'user' }) 
+  UserType?: string; 
+
   @Column({ length: 255, nullable: true })
   school?: string;
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Controller, Post, Body, BadRequestException, ConflictException } from '@nestjs/common';
 import   bcrypt from 'bcryptjs';
 import  jwt from 'jsonwebtoken';
@@ -9,6 +10,27 @@ export class AuthController {
   @Post('register')
   async register(@Body() body: any) {
     const { name, email, password, location, school, courses, program, year } = body;
+=======
+import { Controller, Post, Body, Get , UseGuards, Request} from '@nestjs/common';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+
+@Controller('auth')
+export class AuthController {
+     constructor(private authService: AuthService){}
+
+    @UseGuards(JwtAuthGuard)
+    @Get('me')
+    getMe(@Request() req) {
+    return req.user;
+    }
+
+    @Post('register')
+        async register(@Body() body: RegisterDto) {
+            return this.authService.register(body);
+    }
+>>>>>>> 8e5c342b101c6b77b5b12c345ec8ec55a9d39fd5
 
     let connection;
     try {
@@ -20,6 +42,7 @@ export class AuthController {
         [email]
       );
 
+<<<<<<< HEAD
       if (existingUser.rows && existingUser.rows.length > 0) {
         throw new ConflictException('User already exists');
       }
@@ -86,6 +109,12 @@ export class AuthController {
       const secret = process.env.JWT_SECRET;
 if (!secret) {
   throw new Error('JWT_SECRET is not defined in environment variables');
+=======
+    /*@Get('me')
+    me(){
+        return this.authService.getCurrentUser();
+    }*/
+>>>>>>> 8e5c342b101c6b77b5b12c345ec8ec55a9d39fd5
 }
 
 const token = jwt.sign(
