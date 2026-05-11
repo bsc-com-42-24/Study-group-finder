@@ -1,7 +1,9 @@
 import { Controller, Post, Body, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import oracledb from 'oracledb';
+import {ApiTags,ApiOperation} from '@nestjs/swagger';
 
+@ApiTags('messages')
 @Controller('messages')
 export class MessagesController {
 
